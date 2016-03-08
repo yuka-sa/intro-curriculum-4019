@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  h4 #{schedule.scheduleName}
+  p(style="white-space:pre;") #{schedule.memo}
+  p 作成者: #{schedule.user.username}
+  h3 出欠表
+  table
+    tr
+      th 予定
+      each user in users
+        th #{user.username}
+    each candidate in candidates
+      tr
+        th #{candidate.candidateName}
+        each user in users
+          - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
+          - var availabilityLabel = '欠'
+          - if (availability === 1) { availabilityLabel = '？'; }
+          - if (availability === 2) { availabilityLabel = '出'; }
+          td
+            if user.isSelf
+              button #{availabilityLabel}
+            else
+              p availabilityLabel
