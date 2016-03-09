@@ -124,9 +124,9 @@ function deleteScheduleAggrigate(scheduleId, done) {
         let promises = candidates.map((c) => { return c.destroy(); });
         Promise.all(promises).then(() => {
           Schedule.findById(scheduleId).then((s) => { s.destroy(); });
+          done();
         });
       });
     });
   });
-  done();
 }
