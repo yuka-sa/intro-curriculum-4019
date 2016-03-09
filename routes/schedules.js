@@ -54,6 +54,10 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         Availability.findAll({
           include: [
             {
+              model: Candidate,
+              attributes: ['candidateId', 'candidateName', 'scheduleId']
+            },
+            {
               model: User,
               attributes: ['userId', 'username']
             }
