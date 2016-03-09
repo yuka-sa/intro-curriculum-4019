@@ -66,20 +66,20 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           availabilities.forEach((a) => {
             let map = availabilityMapMap.get(a.user.userId);
             map = map ? map : new Map();
-            map.set(a.candidate.candidateId, a.availability);
+            map.set(a.candidateId, a.availability);
             availabilityMapMap.set(a.user.userId, map);
           });
 
           // 閲覧ユーザーと出欠に紐づくユーザーからユーザー Map (キー:ユーザー ID, 値:ユーザー) を作る
           let userMap = new Map(); // key: userId, value: User
-          userMap.set(req.user.id, {
+          userMap.set(parseInt(req.user.id), {
               isSelf: true,
               userId: req.user.id,
               username: req.user.username
           });
           availabilities.forEach((a) => {
             userMap.set(a.user.userId, {
-              isSelf: req.user.id === a.user.userId, // 閲覧ユーザー自身であるかを含める
+              isSelf: parseInt(req.user.id) === a.user.userId, // 閲覧ユーザー自身であるかを含める
               userId: a.user.userId,
               username: a.user.username
             });
