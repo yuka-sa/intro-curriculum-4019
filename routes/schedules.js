@@ -74,7 +74,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           let userMap = new Map(); // key: userId, value: User
           userMap.set(parseInt(req.user.id), {
               isSelf: true,
-              userId: req.user.id,
+              userId: parseInt(req.user.id),
               username: req.user.username
           });
           availabilities.forEach((a) => {
