@@ -15,11 +15,9 @@ block content
         th #{candidate.candidateName}
         each user in users
           - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
-          - var availabilityLabel = '欠'
-          - if (availability === 1) { availabilityLabel = '？'; }
-          - if (availability === 2) { availabilityLabel = '出'; }
+          - var availabilityLabels = ['欠', '？', '出'];
           td
             if user.isSelf
-              button #{availabilityLabel}
+              button #{availabilityLabels[availability]}
             else
-              p #{availabilityLabel}
+              p #{availabilityLabels[availability]}
