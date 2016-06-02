@@ -1,11 +1,11 @@
 'use strict';
-let request = require('supertest');
-let app = require('../app');
-let passportStub = require('passport-stub');
-let User = require('../models/user');
-let Schedule = require('../models/schedule');
-let Candidate = require('../models/candidate');
-let Availability = require('../models/availability');
+const request = require('supertest');
+const app = require('../app');
+const passportStub = require('passport-stub');
+const User = require('../models/user');
+const Schedule = require('../models/schedule');
+const Candidate = require('../models/candidate');
+const Availability = require('../models/availability');
 
 describe('/login', () => {
   before(() => {
@@ -62,7 +62,7 @@ describe('/schedules', () => {
         .expect('Location', /schedules/)
         .expect(302)
         .end((err, res) => {
-          let createdSchedulePath = res.headers.location;
+          const createdSchedulePath = res.headers.location;
           request(app)
             .get(createdSchedulePath)
             .expect(/テスト予定1/)
@@ -95,8 +95,8 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
         .post('/schedules')
         .send({ scheduleName: 'テスト出欠更新予定1', memo: 'テスト出欠更新メモ1', candidates: 'テスト出欠更新候補1' })
         .end((err, res) => {
-          let createdSchedulePath = res.headers.location;
-          let scheduleId = createdSchedulePath.split('/schedules/')[1];
+          const createdSchedulePath = res.headers.location;
+          const scheduleId = createdSchedulePath.split('/schedules/')[1];
           Candidate.findOne({
             where: { scheduleId: scheduleId }
           }).then((candidate) => {
@@ -116,12 +116,12 @@ function deleteScheduleAggregate(scheduleId, done) {
   Availability.findAll({
     where: { scheduleId: scheduleId }
   }).then((availabilities) => {
-    let promises = availabilities.map((a) => { return a.destroy(); });
+    const promises = availabilities.map((a) => { return a.destroy(); });
     Promise.all(promises).then(() => {
       Candidate.findAll({
         where: { scheduleId: scheduleId }
       }).then((candidates) => {
-        let promises = candidates.map((c) => { return c.destroy(); });
+        const promises = candidates.map((c) => { return c.destroy(); });
         Promise.all(promises).then(() => {
           Schedule.findById(scheduleId).then((s) => { s.destroy(); });
           done();
