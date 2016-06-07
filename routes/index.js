@@ -1,11 +1,11 @@
 'use strict';
-let express = require('express');
-let router = express.Router();
-let Schedule = require('../models/schedule');
+const express = require('express');
+const router = express.Router();
+const Schedule = require('../models/schedule');
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
-  let title = '予定調整くん';
+  const title = '予定調整くん';
   if (req.user) {
     Schedule.findAll({
       where: {
