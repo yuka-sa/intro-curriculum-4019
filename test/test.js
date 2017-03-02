@@ -72,7 +72,7 @@ describe('/schedules', () => {
             .expect(/テスト候補2/)
             .expect(/テスト候補3/)
             .expect(200)
-            .end(() => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done);});
+            .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err);});
         });
     });
   });
@@ -104,15 +104,15 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
             request(app)
               .post(`/schedules/${scheduleId}/users/${0}/candidates/${candidate.candidateId}`)
               .send({ availability: 2 }) // 出席に更新
-              .expect('availability:2')
-              .end(() => { deleteScheduleAggregate(scheduleId, done); });
+              .expect('{"status":"OK","availability":2}')
+              .end((err, res) => { deleteScheduleAggregate(scheduleId, done, err); });
           });
         });
     });
   });
 });
 
-function deleteScheduleAggregate(scheduleId, done) {
+function deleteScheduleAggregate(scheduleId, done, err) {
   Availability.findAll({
     where: { scheduleId: scheduleId }
   }).then((availabilities) => {
@@ -124,6 +124,7 @@ function deleteScheduleAggregate(scheduleId, done) {
         const promises = candidates.map((c) => { return c.destroy(); });
         Promise.all(promises).then(() => {
           Schedule.findById(scheduleId).then((s) => { s.destroy(); });
+          if (err) return done(err);
           done();
         });
       });
