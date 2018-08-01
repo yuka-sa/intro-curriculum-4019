@@ -23,12 +23,14 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
     updatedAt: updatedAt
   }).then((schedule) => {
     const candidateNames = req.body.candidates.trim().split('\n').map((s) => s.trim());
-    const candidates = candidateNames.map((c) => { return {
-      candidateName: c,
-      scheduleId: schedule.scheduleId
-    };});
+    const candidates = candidateNames.map((c) => {
+      return {
+        candidateName: c,
+        scheduleId: schedule.scheduleId
+      };
+    });
     Candidate.bulkCreate(candidates).then(() => {
-          res.redirect('/schedules/' + schedule.scheduleId);
+      res.redirect('/schedules/' + schedule.scheduleId);
     });
   });
 });
@@ -43,12 +45,12 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     where: {
       scheduleId: req.params.scheduleId
     },
-    order: '"updatedAt" DESC'
+    order: [['"updatedAt"', 'DESC']]
   }).then((schedule) => {
     if (schedule) {
       Candidate.findAll({
         where: { scheduleId: schedule.scheduleId },
-        order: '"candidateId" ASC'
+        order: [['"candidateId"', 'ASC']]
       }).then((candidates) => {
         // データベースからその予定の全ての出欠を取得する
         Availability.findAll({
@@ -59,7 +61,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
             }
           ],
           where: { scheduleId: schedule.scheduleId },
-          order: '"user.username" ASC, "candidateId" ASC'
+          order: [[User, 'username', 'ASC'], ['"candidateId"', 'ASC']]
         }).then((availabilities) => {
           // 出欠 MapMap(キー:ユーザー ID, 値:出欠Map(キー:候補 ID, 値:出欠)) を作成する
           const availabilityMapMap = new Map(); // key: userId, value: Map(key: candidateId, availability)
@@ -72,9 +74,9 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           // 閲覧ユーザーと出欠に紐づくユーザーからユーザー Map (キー:ユーザー ID, 値:ユーザー) を作る
           const userMap = new Map(); // key: userId, value: User
           userMap.set(parseInt(req.user.id), {
-              isSelf: true,
-              userId: parseInt(req.user.id),
-              username: req.user.username
+            isSelf: true,
+            userId: parseInt(req.user.id),
+            username: req.user.username
           });
           availabilities.forEach((a) => {
             userMap.set(a.user.userId, {
