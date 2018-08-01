@@ -61,7 +61,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
             }
           ],
           where: { scheduleId: schedule.scheduleId },
-          order: [['User', 'username', 'ASC'], ['"candidateId"', 'ASC']]
+          order: [[User, 'username', 'ASC'], ['"candidateId"', 'ASC']]
         }).then((availabilities) => {
           // 出欠 MapMap(キー:ユーザー ID, 値:出欠Map(キー:候補 ID, 値:出欠)) を作成する
           const availabilityMapMap = new Map(); // key: userId, value: Map(key: candidateId, availability)
