@@ -123,7 +123,7 @@ function deleteScheduleAggregate(scheduleId, done, err) {
       }).then((candidates) => {
         const promises = candidates.map((c) => { return c.destroy(); });
         Promise.all(promises).then(() => {
-          Schedule.findById(scheduleId).then((s) => { s.destroy(); });
+          Schedule.findByPk(scheduleId).then((s) => { s.destroy(); });
           if (err) return done(err);
           done();
         });
