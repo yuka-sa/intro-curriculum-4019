@@ -46,12 +46,12 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     where: {
       scheduleId: req.params.scheduleId
     },
-    order: [['"updatedAt"', 'DESC']]
+    order: [['updatedAt', 'DESC']]
   }).then((schedule) => {
     if (schedule) {
       Candidate.findAll({
         where: { scheduleId: schedule.scheduleId },
-        order: [['"candidateId"', 'ASC']]
+        order: [['candidateId', 'ASC']]
       }).then((candidates) => {
         // データベースからその予定の全ての出欠を取得する
         Availability.findAll({
