@@ -74,9 +74,9 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           // 閲覧ユーザーと出欠に紐づくユーザーからユーザー Map (キー:ユーザー ID, 値:ユーザー) を作る
           const userMap = new Map(); // key: userId, value: User
           userMap.set(parseInt(req.user.id), {
-              isSelf: true,
-              userId: parseInt(req.user.id),
-              username: req.user.username
+            isSelf: true,
+            userId: parseInt(req.user.id),
+            username: req.user.username
           });
           availabilities.forEach((a) => {
             userMap.set(a.user.userId, {
