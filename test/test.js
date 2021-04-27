@@ -11,12 +11,13 @@ describe('/login', () => {
   beforeAll(() => {
     passportStub.install(app);
     passportStub.login({ username: 'testuser' });
-  });
+   });
 
   afterAll(() => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
+
   test('ログインのためのリンクが含まれる', () => {
     return request(app)
       .get('/login')
@@ -24,7 +25,7 @@ describe('/login', () => {
       .expect(/<a href="\/auth\/github"/)
       .expect(200);
   });
-  
+
   test('ログイン時はユーザー名が表示される', () => {
     return request(app)
       .get('/login')
@@ -91,7 +92,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
-  
+
   test('出欠が更新できる', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
@@ -115,7 +116,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
     });
   });
 });
-  
+
 function deleteScheduleAggregate(scheduleId, done, err) {
   Availability.findAll({
     where: { scheduleId: scheduleId }
