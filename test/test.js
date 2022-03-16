@@ -118,13 +118,13 @@ async function deleteScheduleAggregate(scheduleId, done, err) {
   const availabilities = await Availability.findAll({
     where: { scheduleId: scheduleId }
   })
-  const availPromises = availabilities.map((a) => { return a.destroy(); });
-  await Promise.all(availPromises);
+  const promisesAvailabilityDestroy = availabilities.map((a) => { return a.destroy(); });
+  await Promise.all(promisesAvailabilityDestroy);
   const candidates = await Candidate.findAll({
     where: { scheduleId: scheduleId }
   });
-  const candPromises = candidates.map((c) => { return c.destroy(); });
-  await Promise.all(candPromises);
+  const promisesCandidateDestroy = candidates.map((c) => { return c.destroy(); });
+  await Promise.all(promisesCandidateDestroy);
   const s = await Schedule.findByPk(scheduleId);
   await s.destroy();
   if (err) return done(err);
