@@ -13,16 +13,15 @@ var Schedule = require('./models/schedule');
 var Availability = require('./models/availability');
 var Candidate = require('./models/candidate');
 var Comment = require('./models/comment');
-User.sync().then(() => {
+User.sync().then(async () => {
   Schedule.belongsTo(User, {foreignKey: 'createdBy'});
   Schedule.sync();
   Comment.belongsTo(User, {foreignKey: 'userId'});
   Comment.sync();
   Availability.belongsTo(User, {foreignKey: 'userId'});
-  Candidate.sync().then(() => {
-    Availability.belongsTo(Candidate, {foreignKey: 'candidateId'});
-    Availability.sync();
-  });
+  await Candidate.sync()
+  Availability.belongsTo(Candidate, {foreignKey: 'candidateId'});
+  Availability.sync();
 });
 
 var GitHubStrategy = require('passport-github2').Strategy;
@@ -43,13 +42,12 @@ passport.use(new GitHubStrategy({
   callbackURL: 'http://localhost:8000/auth/github/callback'
 },
   function (accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
-      User.upsert({
+    process.nextTick(async function () {
+      await User.upsert({
         userId: profile.id,
         username: profile.username
-      }).then(() => {
-        done(null, profile);
-      });
+      })
+      done(null, profile);
     });
   }
 ));
