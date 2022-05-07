@@ -117,7 +117,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
 async function deleteScheduleAggregate(scheduleId) {
   const availabilities = await Availability.findAll({
     where: { scheduleId: scheduleId }
-  })
+  });
   const promisesAvailabilityDestroy = availabilities.map((a) => { return a.destroy(); });
   await Promise.all(promisesAvailabilityDestroy);
   const candidates = await Candidate.findAll({
