@@ -23,12 +23,10 @@ router.post('/', authenticationEnsurer, async (req, res, next) => {
     updatedAt: updatedAt
   })
   const candidateNames = req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
-  const candidates = candidateNames.map((c) => {
-    return {
-      candidateName: c,
-      scheduleId: schedule.scheduleId
-    };
-  });
+  const candidates = candidateNames.map((c) => { return {
+    candidateName: c,
+    scheduleId: schedule.scheduleId
+  };});
   await Candidate.bulkCreate(candidates);
   res.redirect('/schedules/' + schedule.scheduleId);
 });
@@ -44,12 +42,12 @@ router.get('/:scheduleId', authenticationEnsurer, async (req, res, next) => {
       scheduleId: req.params.scheduleId
     },
     order: [['updatedAt', 'DESC']]
-  })
+  });
   if (schedule) {
     const candidates = await Candidate.findAll({
       where: { scheduleId: schedule.scheduleId },
       order: [['candidateId', 'ASC']]
-    })
+    });
     // データベースからその予定の全ての出欠を取得する
     const availabilities = await Availability.findAll({
       include: [
