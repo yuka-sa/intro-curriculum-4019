@@ -21,7 +21,7 @@ router.post('/', authenticationEnsurer, async (req, res, next) => {
     memo: req.body.memo,
     createdBy: req.user.id,
     updatedAt: updatedAt
-  })
+  });
   const candidateNames = req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
   const candidates = candidateNames.map((c) => { return {
     candidateName: c,
