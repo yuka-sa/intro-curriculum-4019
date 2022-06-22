@@ -15,7 +15,7 @@ describe('/login', () => {
 
   afterAll(() => {
     passportStub.logout();
-    passportStub.uninstall(app);
+    passportStub.uninstall();
   });
 
   test('ログインのためのリンクが含まれる', async () => {
@@ -52,7 +52,7 @@ describe('/schedules', () => {
 
   afterAll(async () => {
     passportStub.logout();
-    passportStub.uninstall(app);
+    passportStub.uninstall();
     await deleteScheduleAggregate(scheduleId);
   });
 
@@ -91,7 +91,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
 
   afterAll(async () => {
     passportStub.logout();
-    passportStub.uninstall(app);
+    passportStub.uninstall();
     await deleteScheduleAggregate(scheduleId);
   });
 
