@@ -1,17 +1,16 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const Schedule = require('../models/schedule');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient({ log: [ 'query' ] });
 
 /* GET home page. */
 router.get('/', async (req, res, next) => {
   const title = '予定調整くん';
   if (req.user) {
-    const schedules = await Schedule.findAll({
-      where: {
-        createdBy: req.user.id
-      },
-      order: [['updatedAt', 'DESC']]
+    const schedules = await prisma.schedule.findMany({
+      where: { createdBy: parseInt(req.user.id) },
+      orderBy: { updatedAt: 'desc' }
     });
     res.render('index', {
       title: title,
