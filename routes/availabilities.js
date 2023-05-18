@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const authenticationEnsurer = require('./authentication-ensurer');
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({ log: [ 'query' ] });
 
 router.post(
   '/:scheduleId/users/:userId/candidates/:candidateId',
