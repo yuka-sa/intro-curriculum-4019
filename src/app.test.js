@@ -16,6 +16,12 @@ function mockIronSession() {
   });
 }
 
+// テストで作成したデータを削除
+async function deleteScheduleAggregate(scheduleId) {
+  await prisma.candidate.deleteMany({ where: { scheduleId } });
+  await prisma.schedule.delete({ where: { scheduleId } });
+}
+
 describe("/login", () => {
   beforeAll(() => {
     mockIronSession();
@@ -58,10 +64,7 @@ describe("/schedules", () => {
 
   afterAll(async () => {
     jest.restoreAllMocks();
-
-    // テストで作成したデータを削除
-    await prisma.candidate.deleteMany({ where: { scheduleId } });
-    await prisma.schedule.delete({ where: { scheduleId } });
+    deleteScheduleAggregate(scheduleId);
   });
 
   test("予定が作成でき、表示される", async () => {
@@ -100,5 +103,61 @@ describe("/schedules", () => {
     expect(body).toMatch(/テスト候補2/);
     expect(body).toMatch(/テスト候補3/);
     expect(res.status).toBe(200);
+  });
+});
+
+describe("/schedules/:scheduleId/users/:userId/candidates/:candidateId", () => {
+  let scheduleId = "";
+  beforeAll(() => {
+    mockIronSession();
+  });
+
+  afterAll(async () => {
+    jest.restoreAllMocks();
+    await deleteScheduleAggregate(scheduleId);
+  });
+
+  test("出欠が更新できる", async () => {
+    await prisma.user.upsert({
+      where: { userId: testUser.userId },
+      create: testUser,
+      update: testUser,
+    });
+
+    const app = require("./app");
+
+    const postRes = await app.request("/schedules", {
+      method: "POST",
+      body: new URLSearchParams({
+        scheduleName: "テスト出欠更新予定1",
+        memo: "テスト出欠更新メモ1",
+        candidates: "テスト出欠更新候補1",
+      }),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    const createdSchedulePath = postRes.headers.get("Location");
+    scheduleId = createdSchedulePath.split("/schedules/")[1];
+
+    const candidate = await prisma.candidate.findFirst({
+      where: { scheduleId },
+    });
+
+    const res = await app.request(
+      `/schedules/${scheduleId}/users/${testUser.userId}/candidates/${candidate.candidateId}`,
+      {
+        method: "POST",
+        body: new URLSearchParams({
+          availability: 2,
+        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      },
+    );
+
+    expect(await res.json()).toEqual({ status: "OK", availability: 2 });
   });
 });
