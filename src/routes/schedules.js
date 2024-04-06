@@ -91,12 +91,52 @@ app.get("/:scheduleId", async (c) => {
     orderBy: { candidateId: "asc" },
   });
 
-  const users = [
-    {
-      userId: user.id,
-      username: user.login,
+  // データベースからその予定の全ての出欠を取得する
+  const availabilities = await prisma.availability.findMany({
+    where: { scheduleId: schedule.scheduleId },
+    orderBy: { candidateId: "asc" },
+    include: {
+      user: {
+        select: {
+          userId: true,
+          username: true,
+        },
+      },
     },
-  ];
+  });
+  // 出欠 MapMap を作成する
+  const availabilityMapMap = new Map(); // key: userId, value: Map(key: candidateId, value: availability)
+  availabilities.forEach((a) => {
+    const map = availabilityMapMap.get(a.user.userId) || new Map();
+    map.set(a.candidateId, a.availability);
+    availabilityMapMap.set(a.user.userId, map);
+  });
+
+  // 閲覧ユーザと出欠に紐づくユーザからユーザ Map を作る
+  const userMap = new Map(); // key: userId, value: User
+  userMap.set(parseInt(user.id), {
+    isSelf: true,
+    userId: parseInt(user.id),
+    username: user.username,
+  });
+  availabilities.forEach((a) => {
+    userMap.set(a.user.userId, {
+      isSelf: parseInt(user.id) === a.user.userId, // 閲覧ユーザ自身であるかを示す真偽値
+      userId: a.user.userId,
+      username: a.user.username,
+    });
+  });
+
+  // 全ユーザ、全候補で二重ループしてそれぞれの出欠の値がない場合には、「欠席」を設定する
+  const users = Array.from(userMap.values());
+  users.forEach((u) => {
+    candidates.forEach((c) => {
+      const map = availabilityMapMap.get(u.userId) || new Map();
+      const a = map.get(c.candidateId) || 0; // デフォルト値は 0 を使用
+      map.set(c.candidateId, a);
+      availabilityMapMap.set(u.userId, map);
+    });
+  });
 
   return c.html(
     layout(
@@ -115,13 +155,20 @@ app.get("/:scheduleId", async (c) => {
             (candidate) => html`
               <tr>
                 <th>${candidate.candidateName}</th>
-                ${users.map(
-                  (user) => html`
+                ${users.map((user) => {
+                  const availability = availabilityMapMap
+                    .get(user.userId)
+                    .get(candidate.candidateId);
+                  const availabilityLabels = ["欠", "？", "出"];
+                  const label = availabilityLabels[availability];
+                  return html`
                     <td>
-                      <button>欠席</button>
+                      ${user.isSelf
+                        ? html`<button>${label}</button>`
+                        : html`<p>${label}</p>`}
                     </td>
-                  `,
-                )}
+                  `;
+                })}
               </tr>
             `,
           )}
