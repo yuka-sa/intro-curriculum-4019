@@ -11,7 +11,7 @@ app.post("/:scheduleId/users/:userId/candidates/:candidateId", async (c) => {
   const userId = parseInt(c.req.param("userId"), 10);
   const candidateId = parseInt(c.req.param("candidateId"), 10);
 
-  const body = await c.req.parseBody();
+  const body = await c.req.json();
   const availability = body.availability ? parseInt(body.availability, 10) : 0;
 
   const data = {
