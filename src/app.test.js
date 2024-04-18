@@ -23,6 +23,17 @@ async function deleteScheduleAggregate(scheduleId) {
   await prisma.schedule.delete({ where: { scheduleId } });
 }
 
+// フォームからリクエストを送信する
+async function sendFormRequest(app, path, body) {
+  return app.request(path, {
+    method: "POST",
+    body: new URLSearchParams(body),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+}
+
 describe("/login", () => {
   beforeAll(() => {
     mockIronSession();
@@ -65,7 +76,7 @@ describe("/schedules", () => {
 
   afterAll(async () => {
     jest.restoreAllMocks();
-    deleteScheduleAggregate(scheduleId);
+    await deleteScheduleAggregate(scheduleId);
   });
 
   test("予定が作成でき、表示される", async () => {
@@ -77,16 +88,10 @@ describe("/schedules", () => {
 
     const app = require("./app");
 
-    const postRes = await app.request("/schedules", {
-      method: "POST",
-      body: new URLSearchParams({
-        scheduleName: "テスト予定1",
-        memo: "テストメモ1\r\nテストメモ2",
-        candidates: "テスト候補1\r\nテスト候補2\r\nテスト候補3",
-      }),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+    const postRes = await sendFormRequest(app, "/schedules", {
+      scheduleName: "テスト予定1",
+      memo: "テストメモ1\r\nテストメモ2",
+      candidates: "テスト候補1\r\nテスト候補2\r\nテスト候補3",
     });
 
     expect(postRes.headers.get("Location")).toMatch(/schedules/);
@@ -127,16 +132,10 @@ describe("/schedules/:scheduleId/users/:userId/candidates/:candidateId", () => {
 
     const app = require("./app");
 
-    const postRes = await app.request("/schedules", {
-      method: "POST",
-      body: new URLSearchParams({
-        scheduleName: "テスト出欠更新予定1",
-        memo: "テスト出欠更新メモ1",
-        candidates: "テスト出欠更新候補1",
-      }),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+    const postRes = await sendFormRequest(app, "/schedules", {
+      scheduleName: "テスト出欠更新予定1",
+      memo: "テスト出欠更新メモ1",
+      candidates: "テスト出欠更新候補1",
     });
 
     const createdSchedulePath = postRes.headers.get("Location");
@@ -153,6 +152,9 @@ describe("/schedules/:scheduleId/users/:userId/candidates/:candidateId", () => {
         body: JSON.stringify({
           availability: 2
         }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
     );
 
