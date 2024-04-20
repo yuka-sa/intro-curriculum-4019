@@ -34,6 +34,17 @@ async function sendFormRequest(app, path, body) {
   });
 }
 
+// JSON を含んだリクエストを送信する
+async function sendJsonRequest(app, path, body) {
+  return app.request(path, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
 describe("/login", () => {
   beforeAll(() => {
     mockIronSession();
@@ -145,16 +156,11 @@ describe("/schedules/:scheduleId/users/:userId/candidates/:candidateId", () => {
       where: { scheduleId },
     });
 
-    const res = await app.request(
+    const res = await sendJsonRequest(
+      app, 
       `/schedules/${scheduleId}/users/${testUser.userId}/candidates/${candidate.candidateId}`,
       {
-        method: "POST",
-        body: JSON.stringify({
-          availability: 2
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        availability: 2,
       },
     );
 
