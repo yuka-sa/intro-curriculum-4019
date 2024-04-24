@@ -13,7 +13,7 @@
   "dependencies": {
     "@hono/node-server": "1.11.0",
     "@hono/oauth-providers": "0.3.1",
-    "@prisma/client": "^5.12.1",
+    "@prisma/client": "5.13.0",
     "hono": "4.2.7",
     "iron-session": "8.0.1",
     "uuid": "9.0.1"
@@ -21,6 +21,6 @@
   "devDependencies": {
     "dotenv": "16.4.5",
     "jest": "29.7.0",
-    "prisma": "^5.12.1"
+    "prisma": "5.13.0"
   }
 }
